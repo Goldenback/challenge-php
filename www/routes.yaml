@@ -1,0 +1,77 @@
+/:
+  controller: HomeController
+  action: index
+
+### Auth routes ###
+/register:
+  controller: AuthController
+  action: register
+
+/login:
+  controller: AuthController
+  action: login
+
+/logout:
+  controller: AuthController
+  action: logout
+
+/forgot-password:
+  controller: AuthController
+  action: forgotPassword
+
+/reset-password:
+  controller: AuthController
+  action: resetPassword
+
+/activate-account:
+  controller: AuthController
+  action: activateAccount
+
+### Page routes ###
+/page:
+  controller: PageController
+  action: show
+
+### Admin pages routes ###
+/admin/pages:
+  controller: PageController
+  action: index
+
+/admin/page:
+  controller: PageController
+  action: admin_show
+
+/admin/pages/create:
+  controller: PageController
+  action: create
+
+/admin/pages/edit:
+  controller: PageController
+  action: edit
+
+/admin/pages/delete:
+  controller: PageController
+  action: delete
+
+### Admin posts routes ###
+
+/admin/posts:
+  controller: PostController
+  action: index
+
+/admin/pages/post/create:
+  controller: PostController
+  action: create
+
+/admin/posts/edit:
+  controller: PostController
+  action: edit
+
+/admin/posts/delete:
+  controller: PostController
+  action: delete
+
+### Error pages ###
+/404:
+  controller: Error
+  action: error404

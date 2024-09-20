@@ -1,0 +1,19 @@
+// Style pour les boutons
+.button {
+  background-color: $primary-color;
+  color: white;
+  padding: 10px 20px;
+  @include rounded-border(10px);
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+// Exemple de style pour une carte
+.card {
+  background-color: white;
+  border: 1px solid $background-color;
+  padding: 20px;
+  @include rounded-border();
+}
