@@ -6,7 +6,7 @@ use App\src\Controllers\Error;
 use Symfony\Component\Yaml\Yaml;
 
 spl_autoload_register("App\myAutoloader");
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/Core/helpers.php';
 
 session_start();

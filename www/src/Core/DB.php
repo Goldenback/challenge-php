@@ -5,55 +5,35 @@ namespace App\src\Core;
 use App\src\Models\Page;
 use App\src\Models\User;
 use PDO;
-use PDOException;
 
 class DB
 {
 	private static ?DB $instance = null;
 	private PDO $connection;
 
+	private string $host = 'postgres';
+	private string $database = 'db_name';
+	private string $user = 'root';
+	private string $password = 'root';
 	private static array $tableMapping = [
 		'users' => User::class,
 		'pages' => Page::class,
 	];
 
-	private function __construct()
+	public function __construct()
 	{
+		$dsn = "pgsql:host=$this->host;dbname=$this->database";
+
 		$options = [
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 			PDO::ATTR_EMULATE_PREPARES => false,
 		];
 
-		// Vérifier si DATABASE_URL est définie (environnement Heroku)
-		$databaseUrl = getenv('DATABASE_URL');
-
-		if ($databaseUrl) {
-			// Parse DATABASE_URL
-			$dbOpts = parse_url($databaseUrl);
-
-			$host = $dbOpts["host"] ?? null;
-			$port = $dbOpts["port"] ?? '5432'; // Port par défaut PostgreSQL
-			$database = ltrim($dbOpts["path"], '/') ?? null;
-			$user = $dbOpts["user"] ?? null;
-			$password = $dbOpts["pass"] ?? null;
-		} else {
-			// Informations de connexion locales ou par défaut
-			$host = 'localhost';
-			$port = '5432';
-			$database = 'db_name';
-			$user = 'root';
-			$password = 'root';
-		}
-
-		$dsn = "pgsql:host={$host};port={$port};dbname={$database}";
-
 		try {
-			$this->connection = new PDO($dsn, $user, $password, $options);
-		} catch (PDOException $e) {
-			// Gérer les exceptions de connexion
-			error_log('Erreur de connexion à la base de données : ' . $e->getMessage());
-			die('Une erreur est survenue lors de la connexion à la base de données.');
+			$this->connection = new PDO($dsn, $this->user, $this->password, $options);
+		} catch (\PDOException $e) {
+			throw new \PDOException($e->getMessage(), (int)$e->getCode());
 		}
 	}
 
