@@ -15,7 +15,6 @@ class Post
 	private bool $isPublished = false;
 	private DateTimeImmutable $createdAt;
 	private ?DateTimeImmutable $updatedAt = null;
-	private ?DateTimeImmutable $deletedAt = null;
 
 	private DB $db;
 
@@ -37,7 +36,7 @@ class Post
 			$method = str_replace('_', '', ucwords($method, '_'));
 
 			if (method_exists($this, $method)) {
-				if (in_array($key, ['created_at', 'updated_at', 'deleted_at']) && $value !== null) {
+				if (in_array($key, ['created_at', 'updated_at']) && $value !== null) {
 					try {
 						$value = new \DateTimeImmutable($value);
 					} catch (\Exception $e) {
@@ -130,16 +129,6 @@ class Post
 		$this->updatedAt = $updatedAt;
 	}
 
-	public function getDeletedAt(): ?DateTimeImmutable
-	{
-		return $this->deletedAt;
-	}
-
-	public function setDeletedAt(?DateTimeImmutable $deletedAt): void
-	{
-		$this->deletedAt = $deletedAt;
-	}
-
 	public function save(): bool
 	{
 		$data = [
@@ -150,7 +139,6 @@ class Post
 			'is_published' => $this->isPublished ? 1 : 0,
 			'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
 			'updated_at' => $this->updatedAt?->format('Y-m-d H:i:s'),
-			'deleted_at' => $this->deletedAt?->format('Y-m-d H:i:s'),
 		];
 
 		return $this->db->insert('posts', $data);
@@ -170,16 +158,6 @@ class Post
 		return $this->db->update('posts', $criteria, $data);
 	}
 
-	public function delete(): bool
-	{
-		$criteria = ['id' => $this->id];
-		$data = [
-			'deleted_at' => (new DateTimeImmutable())->format('Y-m-d H:i:s')
-		];
-
-		return $this->db->update('posts', $criteria, $data);
-	}
-
 	public function erase(): bool
 	{
 		$criteria = ['id' => $this->id];
@@ -189,7 +167,7 @@ class Post
 
 	public function getPage(): ?Page
 	{
-		$pageData = $this->db->getOneBy('pages', ['id' => $this->pageId, 'deleted_at' => null]);
+		$pageData = $this->db->getOneBy('pages', ['id' => $this->pageId]);
 
 		if ($pageData) {
 			return new Page($this->db, $pageData);

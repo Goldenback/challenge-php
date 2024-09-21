@@ -15,6 +15,16 @@ class HomeController
 
 	public function index(): void
 	{
-		include __DIR__ . '/../Views/home/index.php';
+		$page = $this->db->getOneBy('pages', ['is_published' => true, 'is_home' => true]);
+
+		if (!$page && requireRole('admin')) {
+			header('Location: /admin/pages');
+			exit;
+		} else if (!$page) {
+			echo 'Erreur 404';
+			return;
+		}
+
+		header('Location: /page?slug=' . $page['slug']);
 	}
 }

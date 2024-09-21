@@ -1,22 +1,18 @@
 <?php
-// Vérifier si le tableau $pages est défini
-use App\src\Models\Post;
+$title = 'Page de gestion des posts';
 
+ob_start();
+?>
+
+<?php
 if (!isset($posts)) {
 	echo "Aucun post à afficher.";
 	exit;
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestion des posts</title>
-</head>
-<body>
-<h1>Gestion des posts</h1>
-<a href="/admin/pages/create">Créer une nouvelle page</a>
+    <a href="/admin/post/create?id=<?= $page->getId() ?>">Créer un nouveau post</a>
+
 <?php if (!empty($posts)): ?>
     <table>
         <thead>
@@ -30,7 +26,6 @@ if (!isset($posts)) {
         </thead>
         <tbody>
 		<?php foreach ($posts as $post): ?>
-			<?php $post = new Post($this->db, $post); ?>
             <tr>
                 <td><?= $post->getId() ?></td>
                 <td><?= htmlspecialchars($post->getTitle()) ?></td>
@@ -38,8 +33,8 @@ if (!isset($posts)) {
                 <td><?= $post->isPublished() ? 'Oui' : 'Non' ?></td>
                 <td>
                     <a href="/admin/post?id=<?= $post->getId() ?>">Voir</a>
-                    <a href="/admin/posts/edit?id=<?= $post->getId() ?>">Éditer</a>
-                    <form action="/admin/posts/delete" method="POST" style="display:inline;">
+                    <a href="/admin/post/edit?id=<?= $post->getId() ?>">Éditer</a>
+                    <form action="/admin/post/delete?id=<?= $post->getId() ?>" method="POST" style="display:inline;">
                         <input type="hidden" name="id" value="<?= $post->getId() ?>">
                         <button type="submit">Supprimer</button>
                     </form>
@@ -51,12 +46,9 @@ if (!isset($posts)) {
 <?php else: ?>
     <p>Aucun post trouvée.</p>
 <?php endif; ?>
+<?php
 
-<?php if (!empty($_SESSION['flash_message'])): ?>
-    <div class="alert alert-danger">
-		<?= $_SESSION['flash_message']; ?>
-    </div>
-	<?php unset($_SESSION['flash_message']); // Supprimer le message après affichage ?>
-<?php endif; ?>
-</body>
-</html>
+$content = ob_get_clean();
+
+include __DIR__ . '/../../templates/base.php';
+

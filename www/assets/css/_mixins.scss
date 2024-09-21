@@ -1,10 +1,4 @@
-// Exemple de mixin pour une bordure arrondie
-@mixin rounded-border($radius: 5px) {
-  border-radius: $radius;
-}
-
-// Mixin pour le texte centré verticalement et horizontalement
-@mixin center-content {
+@mixin flex-center {
   display: flex;
   justify-content: center;
   align-items: center;

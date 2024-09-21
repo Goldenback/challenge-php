@@ -13,8 +13,6 @@ $db = DB::getInstance();
 
 <nav>
     <ul>
-        <li><a href="/" class="<?= ($_SERVER['REQUEST_URI'] == '/') ? 'active' : '' ?>">Accueil</a></li>
-
 		<?php
 		$pages = Page::getAllPublishedPages($db);
 
@@ -25,11 +23,11 @@ $db = DB::getInstance();
 		?>
 
 		<?php if (isLoggedIn()): ?>
-            <li><a href="/profile">Mon profil</a></li>
+            <!--            <li><a href="/profile">Mon profil</a></li>-->
 			<?php if ($_SESSION['user']['role'] === 'admin'): ?>
                 <li><a href="/admin/pages">Paramètres</a></li>
 			<?php endif; ?>
-            <li><a href="/logout">Déconnexion (<?= htmlspecialchars($_SESSION['user']['username']) ?>)</a></li>
+            <li><a href="/logout">Déconnexion</a></li>
 		<?php else: ?>
             <li><a href="/login" class="<?= ($_SERVER['REQUEST_URI'] == '/login') ? 'active' : '' ?>">Connexion</a></li>
             <li><a href="/register" class="<?= ($_SERVER['REQUEST_URI'] == '/register') ? 'active' : '' ?>">Inscription</a></li>

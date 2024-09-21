@@ -1,20 +1,19 @@
 <?php
-// Vérifier si le tableau $pages est défini
+$title = 'Page de gestion des pages';
+
+// Start output buffering
+ob_start();
+?>
+
+<?php
 if (!isset($pages)) {
 	echo "Aucune page à afficher.";
 	exit;
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestion des pages</title>
-</head>
-<body>
-<h1>Gestion des pages</h1>
-<a href="/admin/pages/create">Créer une nouvelle page</a>
+    <a href="/admin/page/create">Créer une nouvelle page</a>
+
 <?php if (!empty($pages)): ?>
     <table>
         <thead>
@@ -23,21 +22,23 @@ if (!isset($pages)) {
             <th>Titre</th>
             <th>Slug</th>
             <th>Publié</th>
+            <th>Page d'accueil</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
 		<?php foreach ($pages as $page): ?>
             <tr>
-                <td><?= $page['id'] ?></td>
-                <td><?= htmlspecialchars($page['title']) ?></td>
-                <td><?= htmlspecialchars($page['slug']) ?></td>
-                <td><?= $page['is_published'] ? 'Oui' : 'Non' ?></td>
+                <td><?= $page->getId() ?></td>
+                <td><?= htmlspecialchars($page->getTitle()) ?></td>
+                <td><?= htmlspecialchars($page->getSlug()) ?></td>
+                <td><?= $page->isPublished() ? 'Oui' : 'Non' ?></td>
+                <td><?= $page->isHome() ? 'Oui' : 'Non' ?></td>
                 <td>
-                    <a href="/admin/page?id=<?= $page['id'] ?>">Voir</a>
-                    <a href="/admin/pages/edit?id=<?= $page['id'] ?>">Éditer</a>
-                    <form action="/admin/pages/delete" method="POST" style="display:inline;">
-                        <input type="hidden" name="id" value="<?= $page['id'] ?>">
+                    <a href="/admin/page?id=<?= $page->getId() ?>">Voir</a>
+                    <a href="/admin/page/edit?id=<?= $page->getId() ?>">Éditer</a>
+                    <form action="/admin/page/delete?id=<?= $page->getId() ?>" method="POST" style="display:inline;">
+                        <input type="hidden" name="id" value="<?= $page->getId() ?>">
                         <button type="submit">Supprimer</button>
                     </form>
                 </td>
@@ -49,11 +50,10 @@ if (!isset($pages)) {
     <p>Aucune page trouvée.</p>
 <?php endif; ?>
 
-<?php if (!empty($_SESSION['flash_message'])): ?>
-    <div class="alert alert-danger">
-		<?= $_SESSION['flash_message']; ?>
-    </div>
-	<?php unset($_SESSION['flash_message']); // Supprimer le message après affichage ?>
-<?php endif; ?>
-</body>
-</html>
+    <a href="/export-solution" class="btn btn-primary">Exporter la Solution</a>
+
+<?php
+// End output buffering and get the content
+$content = ob_get_clean();
+
+include __DIR__ . '/../../templates/base.php';

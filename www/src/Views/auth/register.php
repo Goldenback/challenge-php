@@ -1,6 +1,7 @@
-<h1>Inscription</h1>
-<form method="POST" action="/register">
-    <label for="username">Nom d'utilisateur :</label>
+<?php
+$title = 'Inscription';
+$content = '<form action="/register" method="POST">
+    <label for="username">Nom d\'utilisateur :</label>
     <input type="text" name="username" id="username" required>
 
     <label for="email">Email :</label>
@@ -9,12 +10,6 @@
     <label for="password">Mot de passe :</label>
     <input type="password" name="password" id="password" required>
 
-    <button type="submit">S'inscrire</button>
-</form>
-
-<?php if (!empty($_SESSION['flash_message'])): ?>
-    <div class="alert alert-success">
-		<?= $_SESSION['flash_message']; ?>
-    </div>
-	<?php unset($_SESSION['flash_message']); // Supprimer le message après affichage ?>
-<?php endif; ?>
+    <button type="submit">S\'inscrire</button>
+</form>';
+include __DIR__ . '/../templates/base.php';

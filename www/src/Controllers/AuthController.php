@@ -21,7 +21,6 @@ class AuthController
 	}
 
 	/**
-	 * @throws Exception
 	 * @throws RandomException
 	 */
 	public function register(): void
@@ -113,9 +112,6 @@ class AuthController
 		exit;
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	private function sendActivationEmail(string $email, string $token): void
 	{
 		$mail = new PHPMailer();

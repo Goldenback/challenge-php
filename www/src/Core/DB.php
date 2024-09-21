@@ -68,6 +68,18 @@ class DB
 		}
 	}
 
+	public function getAll(string $table, string $returnType = "array"): array
+	{
+		$sql = "SELECT * FROM " . $table;
+		$stmt = $this->connection->query($sql);
+
+		if ($returnType == "object") {
+			return $stmt->fetchAll(PDO::FETCH_CLASS, $this->getClassNameFromTable($table));
+		} else {
+			return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		}
+	}
+
 	private function getClassNameFromTable(string $table): string
 	{
 		if (array_key_exists($table, self::$tableMapping)) {

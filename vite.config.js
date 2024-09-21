@@ -2,10 +2,10 @@ import {defineConfig} from 'vite';
 
 export default defineConfig({
     build: {
-        outDir: 'public/assets',
+        outDir: 'www/public/assets',
         assetsDir: 'css',
         rollupOptions: {
-            input: 'assets/css/main.scss',
+            input: 'www/assets/css/main.scss',
             output: {
                 assetFileNames: 'css/main.css',
                 entryFileNames: 'js/[name].js',

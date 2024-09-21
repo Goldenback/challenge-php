@@ -1,6 +1,4 @@
-vendor
+www/vendor
 node_modules
 .DS_Store
 .idea
-nginx
-php

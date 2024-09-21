@@ -41,35 +41,43 @@
   controller: PageController
   action: admin_show
 
-/admin/pages/create:
+/admin/page/create:
   controller: PageController
   action: create
 
-/admin/pages/edit:
+/admin/page/edit:
   controller: PageController
   action: edit
 
-/admin/pages/delete:
+/admin/page/delete:
   controller: PageController
   action: delete
 
 ### Admin posts routes ###
-
 /admin/posts:
   controller: PostController
   action: index
 
-/admin/pages/post/create:
+/admin/post:
+  controller: PostController
+  action: admin_show
+
+/admin/post/create:
   controller: PostController
   action: create
 
-/admin/posts/edit:
+/admin/post/edit:
   controller: PostController
   action: edit
 
-/admin/posts/delete:
+/admin/post/delete:
   controller: PostController
   action: delete
+
+### Admin features ###
+/export-solution:
+  controller: FeatureController
+  action: exportSolution
 
 ### Error pages ###
 /404:

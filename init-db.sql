@@ -31,9 +31,9 @@ CREATE TABLE pages
     slug         VARCHAR(255) UNIQUE       NOT NULL,
     content      TEXT                      NOT NULL,
     is_published BOOLEAN     DEFAULT false NOT NULL,
+    is_home      BOOLEAN     DEFAULT false NOT NULL,
     created_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at   TIMESTAMPTZ
+    updated_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE posts
@@ -45,8 +45,7 @@ CREATE TABLE posts
     content      TEXT                      NOT NULL,
     is_published BOOLEAN     DEFAULT false NOT NULL,
     created_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at   TIMESTAMPTZ
+    updated_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE comments
@@ -56,5 +55,7 @@ CREATE TABLE comments
     user_id    INT                           REFERENCES users (id) ON DELETE SET NULL,
     content    TEXT                          NOT NULL,
     status     VARCHAR(50) DEFAULT 'pending' NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ
 );

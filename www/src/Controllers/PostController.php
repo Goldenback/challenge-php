@@ -16,55 +16,6 @@ class PostController
 		$this->db = DB::getInstance();
 	}
 
-	// Création d'un nouvel article
-	public function create(): void
-	{
-		requireRole('admin');
-		$pageId = $_GET['id'] ?? null;
-
-		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-			$data = [
-				'title' => $_POST['title'],
-				'slug' => $_POST['slug'],
-				'content' => $_POST['content'],
-				'is_published' => $_POST['is_published'] ?? false,
-			];
-
-			$post = new Post($this->db);
-			$post->setPageId($pageId);
-			$post->setTitle($data['title']);
-			$post->setSlug($data['slug']);
-			$post->setContent($data['content']);
-			$post->setIsPublished($data['is_published']);
-			$post->setCreatedAt(new DateTimeImmutable());
-
-			if ($post->save()) {
-				$_SESSION['flash_message'] = 'Article créé avec succès.';
-				header('Location: /admin/posts?id=' . $pageId);
-			} else {
-				$_SESSION['flash_message'] = 'Erreur lors de la création de l\'article.';
-				header('Location: /admin/posts/create');
-			}
-		} else {
-			require_once __DIR__ . '/../Views/admin/posts/create.php';
-		}
-	}
-
-	// Liste des articles dans le panneau d'administration
-	public function index(): void
-	{
-		requireRole('admin'); // Vérifie que l'utilisateur est administrateur
-
-		$pageRequest = $this->db->getOneBy('pages', ['id' => $_GET['id']]);
-		$page = new Page($this->db, $pageRequest);
-
-		$stmt = $this->db->getConnection()->prepare("SELECT * FROM posts WHERE deleted_at IS NULL AND page_id = " . $page->getId());
-		$stmt->execute();
-		$posts = $stmt->fetchAll();
-
-		require_once __DIR__ . '/../Views/admin/posts/index.php';
-	}
-
 	// Afficher un article spécifique
 	public function show(): void
 	{
@@ -87,6 +38,108 @@ class PostController
 		}
 	}
 
+	///// ADMIN /////
+	// Liste des articles dans le panneau d'administration
+	public function index(): void
+	{
+		requireRole('admin');
+
+		$id = $_GET['id'] ?? null;
+
+		if ($id) {
+			$pageData = $this->db->getOneBy('pages', ['id' => $id]);
+
+			if ($pageData) {
+				$page = new Page($this->db, $pageData);
+				$posts = $page->getPosts();
+
+				require_once __DIR__ . '/../Views/admin/posts/index.php';
+			} else {
+				$_SESSION['flash_message'] = 'Page non trouvée.';
+				header('Location: /admin/pages');
+			}
+			exit;
+		} else {
+			$_SESSION['flash_message'] = 'Aucun identifiant de page fourni.';
+			header('Location: /admin/pages');
+		}
+	}
+
+	// Création d'un nouvel article
+	public function create(): void
+	{
+		requireRole('admin');
+
+		$pageId = $_GET['id'] ?? null;
+
+		if ($pageId) {
+			$pageData = $this->db->getOneBy('pages', ['id' => $pageId]);
+
+			if ($pageData) {
+				$page = new Page($this->db, $pageData);
+
+				if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+					$data = [
+						'title' => $_POST['title'],
+						'content' => $_POST['content'],
+						'is_published' => $_POST['is_published'] ?? false,
+					];
+
+					if ($data['title']) {
+						$post = new Post($this->db);
+						$post->setPageId($pageId);
+						$post->setTitle($data['title']);
+						$post->setSlug(slugify($data['title']));
+						$post->setContent($data['content']);
+						$post->setIsPublished($data['is_published']);
+						$post->setCreatedAt(new DateTimeImmutable());
+
+						if ($post->save()) {
+							$_SESSION['flash_message'] = 'Article créé avec succès.';
+							header('Location: /admin/posts?id=' . $pageId);
+						} else {
+							$_SESSION['flash_message'] = 'Erreur lors de la création de l\'article.';
+							header('Location: /admin/posts/create?id=' . $pageId);
+						}
+						exit;
+					}
+				} else {
+					require_once __DIR__ . '/../Views/admin/posts/create.php';
+				}
+			} else {
+				$_SESSION['flash_message'] = 'Page non trouvée.';
+				header('Location: /admin/pages');
+			}
+		} else {
+			$_SESSION['flash_message'] = 'Aucun identifiant de page fourni.';
+			header('Location: /admin/pages');
+		}
+	}
+
+	// Afficher une page spécifique en admin
+	public function admin_show(): void
+	{
+		requireRole('admin');
+
+		$id = $_GET['id'] ?? null;
+
+		if ($id) {
+			$postData = $this->db->getOneBy('posts', ['id' => $id]);
+
+			if ($postData) {
+				$post = new Post($this->db, $postData);
+
+				require_once __DIR__ . '/../Views/admin/posts/show.php';
+			} else {
+				$_SESSION['flash_message'] = 'Article non trouvé.';
+				header('Location: /admin/posts');
+			}
+		} else {
+			$_SESSION['flash_message'] = 'Aucun identifiant d\'article fourni.';
+			header('Location: /admin/posts');
+		}
+	}
+
 	// Modification d'un article existant
 	public function edit(): void
 	{
@@ -103,23 +156,24 @@ class PostController
 				if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					$data = [
 						'title' => $_POST['title'],
-						'slug' => $_POST['slug'],
 						'content' => $_POST['content'],
 						'is_published' => $_POST['is_published'] ?? false,
 					];
 
 					$post->setTitle($data['title']);
-					$post->setSlug($data['slug']);
+					$post->setSlug(slugify($data['title']));
 					$post->setContent($data['content']);
 					$post->setIsPublished($data['is_published']);
+					$post->setUpdatedAt(new DateTimeImmutable());
 
 					if ($post->update()) {
 						$_SESSION['flash_message'] = 'Article modifié avec succès.';
-						header('Location: /admin/posts');
+						header('Location: /admin/posts?id=' . $post->getPageId());
 					} else {
 						$_SESSION['flash_message'] = 'Erreur lors de la modification de l\'article.';
-						header('Location: /admin/posts/edit?id=' . $id);
+						header('Location: /admin/post/edit?id=' . $id);
 					}
+					exit;
 				} else {
 					require_once __DIR__ . '/../Views/admin/posts/edit.php';
 				}
@@ -129,7 +183,7 @@ class PostController
 			}
 		} else {
 			$_SESSION['flash_message'] = 'Aucun identifiant d\'article fourni.';
-			header('Location: /admin/posts');
+			header('Location: /admin/posts/');
 		}
 	}
 
@@ -145,12 +199,15 @@ class PostController
 
 			if ($postData) {
 				$post = new Post($this->db, $postData);
+				$pageId = $post->getPageId();
 
-				if ($post->delete()) {
+				if ($post->erase()) {
 					$_SESSION['flash_message'] = 'Article supprimé avec succès.';
 				} else {
 					$_SESSION['flash_message'] = 'Erreur lors de la suppression de l\'article.';
 				}
+				header('Location: /admin/posts?id=' . $pageId);
+				exit;
 			} else {
 				$_SESSION['flash_message'] = 'Article non trouvé.';
 			}
@@ -159,4 +216,6 @@ class PostController
 		}
 		header('Location: /admin/posts');
 	}
+	///// ADMIN /////
+
 }

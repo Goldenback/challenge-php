@@ -13,9 +13,9 @@ class Page
 	private string $slug;
 	private string $content;
 	private bool $isPublished = false;
+	private bool $isHome = false;
 	private DateTimeImmutable $createdAt;
 	private ?DateTimeImmutable $updatedAt = null;
-	private ?DateTimeImmutable $deletedAt = null;
 
 	private DB $db;
 
@@ -37,7 +37,7 @@ class Page
 			$method = str_replace('_', '', ucwords($method, '_'));
 
 			if (method_exists($this, $method)) {
-				if (in_array($key, ['created_at', 'updated_at', 'deleted_at']) && $value !== null) {
+				if (in_array($key, ['created_at', 'updated_at']) && $value !== null) {
 					try {
 						$value = new \DateTimeImmutable($value);
 					} catch (\Exception $e) {
@@ -100,6 +100,16 @@ class Page
 		$this->isPublished = $isPublished;
 	}
 
+	public function isHome(): bool
+	{
+		return $this->isHome;
+	}
+
+	public function setIsHome(bool $isHome): void
+	{
+		$this->isHome = $isHome;
+	}
+
 	public function getCreatedAt(): DateTimeImmutable
 	{
 		return $this->createdAt;
@@ -120,16 +130,6 @@ class Page
 		$this->updatedAt = $updatedAt;
 	}
 
-	public function getDeletedAt(): ?DateTimeImmutable
-	{
-		return $this->deletedAt;
-	}
-
-	public function setDeletedAt(?DateTimeImmutable $deletedAt): void
-	{
-		$this->deletedAt = $deletedAt;
-	}
-
 	public function save(): bool
 	{
 		$data = [
@@ -137,9 +137,9 @@ class Page
 			'slug' => $this->slug,
 			'content' => $this->content,
 			'is_published' => $this->isPublished ? 1 : 0,
+			'is_home' => $this->isHome ? 1 : 0,
 			'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
 			'updated_at' => $this->updatedAt?->format('Y-m-d H:i:s'),
-			'deleted_at' => $this->deletedAt?->format('Y-m-d H:i:s'),
 		];
 
 		return $this->db->insert('pages', $data);
@@ -153,17 +153,8 @@ class Page
 			'slug' => $this->slug,
 			'content' => $this->content,
 			'is_published' => $this->isPublished ? 1 : 0,
+			'is_home' => $this->isHome ? 1 : 0,
 			'updated_at' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
-		];
-
-		return $this->db->update('pages', $criteria, $data);
-	}
-
-	public function delete(): bool
-	{
-		$criteria = ['id' => $this->id];
-		$data = [
-			'deleted_at' => (new DateTimeImmutable())->format('Y-m-d H:i:s')
 		];
 
 		return $this->db->update('pages', $criteria, $data);
@@ -178,14 +169,14 @@ class Page
 
 	public static function getAllPublishedPages(DB $db): array
 	{
-		$stmt = $db->getConnection()->prepare("SELECT * FROM pages WHERE is_published = TRUE AND deleted_at IS NULL ORDER BY title ASC");
+		$stmt = $db->getConnection()->prepare("SELECT * FROM pages WHERE is_published = TRUE ORDER BY title ASC");
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public function getPosts(): array
 	{
-		$stmt = $this->db->getConnection()->prepare("SELECT * FROM posts WHERE page_id = :page_id AND deleted_at IS NULL ORDER BY created_at DESC");
+		$stmt = $this->db->getConnection()->prepare("SELECT * FROM posts WHERE page_id = :page_id ORDER BY created_at DESC");
 		$stmt->execute(['page_id' => $this->id]);
 		$postsData = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
