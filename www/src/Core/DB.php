@@ -80,6 +80,24 @@ class DB
 		}
 	}
 
+	public function getAllBy(string $table, array $criteria, string $returnType = "array"): array
+	{
+		$sql = "SELECT * FROM " . $table . " WHERE ";
+		foreach ($criteria as $column => $value) {
+			$sql .= $column . "=:" . $column . " AND ";
+		}
+		$sql = rtrim($sql, ' AND ');
+
+		$stmt = $this->connection->prepare($sql);
+		$stmt->execute($criteria);
+
+		if ($returnType == "object") {
+			return $stmt->fetchAll(PDO::FETCH_CLASS, $this->getClassNameFromTable($table));
+		} else {
+			return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		}
+	}
+
 	private function getClassNameFromTable(string $table): string
 	{
 		if (array_key_exists($table, self::$tableMapping)) {

@@ -74,6 +74,31 @@
   controller: PostController
   action: delete
 
+### Post Comments routes ###
+/post/comments:
+  controller: CommentController
+  action: show
+
+/comment/create:
+  controller: CommentController
+  action: create
+
+/comment/edit:
+  controller: CommentController
+  action: edit
+
+/admin/comment/approve:
+  controller: CommentController
+  action: approve
+
+/admin/comment/delete:
+  controller: CommentController
+  action: delete
+
+/admin/erase:
+  controller: CommentController
+  action: erase
+
 ### Admin features ###
 /export-solution:
   controller: FeatureController

@@ -1,7 +1,8 @@
 <?php
 $title = 'Créer un nouvel article';
+$pageId = $_GET['id'] ?? ''; // Assurez-vous que $pageId est bien défini
 $content = '
-<form action="/admin/post/create?id=<?= $pageId ?>" method="POST">
+<form action="/admin/post/create?id=' . htmlspecialchars($pageId) . '" method="POST">
     <label for="title">Titre :</label><br>
     <input type="text" name="title" id="title" required><br><br>
 
@@ -13,6 +14,6 @@ $content = '
 
     <button type="submit">Créer</button>
 </form>';
+
 $enableTinyMCE = true;
 include __DIR__ . '/../../templates/base.php';
-

@@ -4,10 +4,7 @@ if (!isset($page)) {
 	exit;
 }
 
-$link = '';
-if (count($page->getPosts()) > 0) {
-	$link = '<a href="/admin/posts?id=' . htmlspecialchars($page->getId()) . '">Voir les posts</a>';
-}
+$link = '<a href="/admin/posts?id=' . htmlspecialchars($page->getId()) . '">Voir les posts</a>';
 
 $title = htmlspecialchars($page->getTitle());
 $content = $link . '<br>' . $page->getContent();
