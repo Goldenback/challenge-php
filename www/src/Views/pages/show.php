@@ -5,10 +5,14 @@ if (!isset($page)) {
 }
 
 $title = $page->getTitle();
-$content = '<h1>' . htmlspecialchars($title) . '</h1>';
-$content .= '<div>' . htmlspecialchars($content) . '</div>';
+$pageContent = $page->getContent(); // Contenu principal de la page
 
+// Assurez-vous que vous avez accès aux posts depuis le contrôleur
 $posts = $page->getPosts() ?? []; // Utilisez une liste vide si aucun post n'est trouvé
+
+// Construire le contenu HTML
+$content = '<h1>' . htmlspecialchars($title) . '</h1>';
+$content .= '<div>' . $pageContent . '</div>';
 
 if (!empty($posts)) {
 	$content .= '<h2>Posts associés :</h2>';
@@ -16,14 +20,14 @@ if (!empty($posts)) {
 	foreach ($posts as $post) {
 		$content .= '<li>';
 		$content .= '<h3>' . htmlspecialchars($post->getTitle()) . '</h3>';
-		$content .= '<p>' . htmlspecialchars($post->getContent()) . '</p>';
+		$content .= '<p>' . $post->getContent() . '</p>';
 		$content .= '<p><a href="/post?id=' . htmlspecialchars($post->getId()) . '">Lire plus</a></p>';
 		$content .= '</li>';
 	}
 	$content .= '</ul>';
-} else {
-	$content .= '<p>Aucun post associé à cette page.</p>';
 }
 
-$enableTinyMCE = false; // Assurez-vous que TinyMCE est désactivé pour cette vue
+// Désactiver TinyMCE pour cette vue si ce n'est pas nécessaire
+$enableTinyMCE = false;
+
 include __DIR__ . '/../templates/base.php';
